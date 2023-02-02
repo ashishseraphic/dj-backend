@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const jwtConfig = process.env.JWT_CONFIG;
 const emailValidator = require('email-validator');
 // const nodemailer = require('nodemailer');
-const otp = require('../otp module/otp');
+// const otp = require('../otp module/otp');
 // const generateOTP = require('../otp module/otpCreate');
 
 
