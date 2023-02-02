@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controller/userController');
-const mobileUserController=require('../controller/mobileUserController')
+const {login}=require('../controller/mobileUserController')
 
 
 
 
 router.post('/login',userController.login)
-router.post('/mobilelogin',mobileUserController.login)
+router.post('/mobilelogin',login)
 
 
 // router.post('/verifyotp',adminController.verificationSignup)

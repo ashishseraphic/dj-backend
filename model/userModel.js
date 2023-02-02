@@ -35,7 +35,11 @@ const modelSchema = new mongoose.Schema({
     },
     userName :{
         type:String
+    },
+    firebaseUId:{
+        type:String
     }
+
 });
 
 
