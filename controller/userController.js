@@ -15,12 +15,8 @@ const saltRounds = 12;
 const controller = {
 
     async login(req, res) {
-        console.log("token", req.headers);
-        console.log("token-2", req.body);
-
-        console.log("role", req.body.selectedRole);
-        // let { email, password } = req.body.form
-        // let selectedRole = req.body.selectedRole
+        let { email, password } = req.body.form
+        let selectedRole = req.body.selectedRole
 
         try {
             const logInAuth = await user.findOne({ email });
@@ -37,7 +33,6 @@ const controller = {
                 }, jwtConfig)
 
                 newData.save().then(result => {
-                    // otp.Sendmail(email, otpCode);
                     res.status(200).json({
                         message: msg.success,
                         data: result, jwtToken
@@ -58,11 +53,15 @@ const controller = {
                             message: 'password not match'
                         })
                     }
+                    const jwtToken = jwt.sign({
+                        id: newData._id,
+                    }, jwtConfig)
+
                     logInAuth.save().then(result => {
                         res.json({
-                            status:true,
+                            status: true,
                             message: 'successfully logIn',
-                            data: result
+                            data: result, jwtToken
                         })
                     })
                 }

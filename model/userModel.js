@@ -25,7 +25,7 @@ const modelSchema = new mongoose.Schema({
     selectedRole:{
         type:String,
         enum:['admin','dj'],
-        default:'admin'
+        
     },
     // verification:{
     //     type:Boolean,default:false
