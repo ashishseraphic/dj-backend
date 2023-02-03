@@ -1,7 +1,6 @@
 const user = require("../model/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const jwtConfig = process.env.JWT_CONFIG;
 const firebase = require("../helpers/firebasePostReq");
 
 const saltRounds = 12;
@@ -35,7 +34,7 @@ module.exports = {
             {
               id: newUser._id,
             },
-            jwtConfig
+            process.env.JWT_CONFIG
           );
           newUser.save().then((result) => {
             // otp.Sendmail(email, otpCode);
@@ -59,7 +58,7 @@ module.exports = {
             {
               id: newUser._id,
             },
-            jwtConfig
+            process.env.JWT_CONFIG
           );
 
           res.status(200).json({
@@ -85,9 +84,7 @@ module.exports = {
   },
 
   djLogin: async (req, res) => {
-
-    let { email, password } = req.body.form
-    let selectedRole = req.body.selectedRole
+    let { email, password,selectedRole } = req.body
 
     try {
       const logInAuth = await user.findOne({ email });
@@ -96,46 +93,46 @@ module.exports = {
         const newData = await user.create({
           email: email,
           password: hassword,
-          selectedRole: selectedRole,
+          selectedRole:selectedRole
         })
         const jwtToken = jwt.sign({
           id: newData._id,
-        }, jwtConfig)
+        }, process.env.JWT_CONFIG)
 
         newData.save().then(result => {
           res.status(200).json({
-            message: msg.success,
-            data: result, jwtToken
+            message: "signup successfully",
+            data: {
+              user: result,
+              token: jwtToken
+            }
           })
         })
       }
 
       if (logInAuth) {
-
-        if (selectedRole != logInAuth.selectedRole) {
+        const hassword = await bcrypt.compare(password, logInAuth.password);
+        if (!hassword) {
           res.json({
-            message: 'data not found'
-          })
-        } else {
-          const hassword = await bcrypt.compare(password, logInAuth.password)
-          if (!hassword) {
-            res.json({
-              message: 'password not match'
-            })
-          }
-          const jwtToken = jwt.sign({
-            id: newData._id,
-          }, jwtConfig)
-
-          logInAuth.save().then(result => {
-            res.json({
-              status: true,
-              message: 'successfully logIn',
-              data: result, jwtToken
-            })
+            message: 'Password not match'
           })
         }
+        const jwtToken = jwt.sign({
+          id: logInAuth._id,
+        }, process.env.JWT_CONFIG)
+
+        logInAuth.save().then(result => {
+          res.json({
+            status: true,
+            message: 'successfully logIn',
+            data: {
+              user: result,
+              token: jwtToken
+            }
+          })
+        })
       }
+
     } catch (err) {
       res.status(500).json({
         msg: "SERVER ERROR",

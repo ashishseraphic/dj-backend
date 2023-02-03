@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const jwtConfig = process.env.JWT_CONFIG;
 
 const verifyToken = function(req,res,next){
     const token = req.body.token||req.query.token||req.headers['authorization']
@@ -10,7 +9,7 @@ const verifyToken = function(req,res,next){
         });
     };
     try{
-        const decode = jwt.verify(token,jwtConfig)
+        const decode = jwt.verify(token,process.env.JWT_CONFIG)
         req.user = decode 
         return next()
     }catch(err){
