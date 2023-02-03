@@ -9,27 +9,16 @@ const modelSchema = new mongoose.Schema({
     password: {
         type: String,
     },
-    // confirmPassword : {
-    //     type: String,
-    // },
     created_at: {
         type: Date,
         required: true,
         default: Date.now
     },
-    otp:{
-        type:Number,
-        // expires:'5m',
-        //         index:true
-    },
     selectedRole:{
         type:String,
-        enum:['admin','dj'],
+        enum:['admin','dj','user'],
         
     },
-    // verification:{
-    //     type:Boolean,default:false
-    // },
     phoneNumber:{
         type:String
     },
