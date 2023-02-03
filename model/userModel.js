@@ -1,35 +1,28 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-
-const modelSchema = new mongoose.Schema({
-
+const userSchema = new mongoose.Schema(
+  {
     email: {
-        type: String,
+      type: String,
     },
     password: {
-        type: String,
+      type: String,
     },
-    created_at: {
-        type: Date,
-        required: true,
-        default: Date.now
+    role: {
+      type: String,
+      enum: ["admin", "dj", "user"],
     },
-    selectedRole:{
-        type:String,
-        enum:['admin','dj','user'],
-        
+    phoneNumber: {
+      type: String,
     },
-    phoneNumber:{
-        type:String
+    userName: {
+      type: String,
     },
-    userName :{
-        type:String
+    firebaseUId: {
+      type: String,
     },
-    firebaseUId:{
-        type:String
-    }
+  },
+  { timestamps: true }
+);
 
-});
-
-
-module.exports = mongoose.model('user', modelSchema)
+module.exports = mongoose.model("user", userSchema);

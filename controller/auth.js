@@ -4,6 +4,9 @@ const bcrypt = require("bcrypt");
 const jwtConfig = process.env.JWT_CONFIG;
 const firebase = require("../helpers/firebasePostReq");
 
+// helper methods
+const { passwordHasher, passwordCompare } = require("../helpers/jwtFunction");
+
 const saltRounds = 12;
 
 module.exports = {
@@ -85,65 +88,78 @@ module.exports = {
   },
 
   djLogin: async (req, res) => {
-
-    let { email, password } = req.body.form
-    let selectedRole = req.body.selectedRole
+    let { email, password, role = "dj" } = req.body;
+    let selectedRole = req.body.selectedRole;
 
     try {
       const logInAuth = await user.findOne({ email });
+
+      // If user donot have entry in DB than register handler
       if (!logInAuth) {
-        const hassword = await bcrypt.hash(password, saltRounds)
+        const hassword = await passwordHasher(password);
+        console.log("check teh hash word here - ", hassword);
         const newData = await user.create({
           email: email,
           password: hassword,
-          selectedRole: selectedRole,
-        })
-        const jwtToken = jwt.sign({
-          id: newData._id,
-        }, jwtConfig)
+          role,
+        });
+        const jwtToken = jwt.sign(
+          {
+            id: newData._id,
+          },
+          process.env.JWT_CONFIG
+        );
 
-        newData.save().then(result => {
-          res.status(200).json({
-            message: msg.success,
-            data: result, jwtToken
-          })
-        })
+        const savedData = await newData.save();
+        res.status(200).json({
+          status: "success",
+          message: "User has been registered successfully",
+          data: { user: savedData, token: jwtToken },
+        });
       }
 
+      // If user has an entry in DB than login handler
       if (logInAuth) {
-
-        if (selectedRole != logInAuth.selectedRole) {
-          res.json({
-            message: 'data not found'
-          })
+        if (role != logInAuth?.role) {
+          return res.send({
+            status: "success",
+            message: "No user found",
+            data: null,
+          });
         } else {
-          const hassword = await bcrypt.compare(password, logInAuth.password)
+          const hassword = await passwordCompare(password, logInAuth.password);
           if (!hassword) {
-            res.json({
-              message: 'password not match'
-            })
+            return res.send({
+              status: "error",
+              message: "Passwords mismatched",
+              data: null,
+            });
           }
-          const jwtToken = jwt.sign({
-            id: newData._id,
-          }, jwtConfig)
+          const jwtToken = jwt.sign(
+            {
+              id: logInAuth._id,
+            },
+            process.env.JWT_CONFIG
+          );
 
-          logInAuth.save().then(result => {
-            res.json({
-              status: true,
-              message: 'successfully logIn',
-              data: result, jwtToken
-            })
-          })
+          // const loginRes = await logInAuth.save();
+
+          // Removing password from user object before sending api response
+          delete logInAuth.password;
+
+          res.json({
+            status: "success",
+            message: "User login successful",
+            data: { user: logInAuth, token: jwtToken },
+          });
         }
       }
     } catch (err) {
       res.status(500).json({
-        msg: "SERVER ERROR",
-        errormsg: err.message
-      })
+        status: "error",
+        message: "Some issue while user authentication",
+        data: err.message,
+      });
     }
   },
-
-
-
 };
