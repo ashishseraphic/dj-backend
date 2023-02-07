@@ -1,11 +1,13 @@
 const jwt = require("jsonwebtoken");
-const jwtConfig = process.env.JWT_CONFIG;
 const bcrypt = require("bcrypt");
+const User = require("../model/userModel");
 
 module.exports = {
   verifyToken: async (req, res, next) => {
-    const token =
-      req.body.token || req.query.token || req.headers["authorization"];
+    let jwt_token = req.headers["authorization"];
+    console.log(jwt_token);
+    let token = jwt_token.split(" ")[1];
+    console.log(token);
     if (!token) {
       return res.json({
         success: false,
@@ -13,7 +15,7 @@ module.exports = {
       });
     }
     try {
-      const decode = await jwt.verify(token, process.env.JWT_SALT);
+      const decode = jwt.verify(token, process.env.JWT_CONFIG);
       req.user = decode;
       return next();
     } catch (err) {
