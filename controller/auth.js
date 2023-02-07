@@ -38,7 +38,7 @@ module.exports = {
             {
               id: newUser._id,
             },
-            jwtConfig
+            process.env.JWT_CONFIG
           );
           newUser.save().then((result) => {
             // otp.Sendmail(email, otpCode);
@@ -62,7 +62,7 @@ module.exports = {
             {
               id: newUser._id,
             },
-            jwtConfig
+            process.env.JWT_CONFIG
           );
 
           res.status(200).json({
