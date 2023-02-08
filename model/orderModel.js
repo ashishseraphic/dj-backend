@@ -16,6 +16,12 @@ const orderSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    video:{
+      type:String
+    },
+    voiceMessage:{
+      type:String
+    },
     songName: {
       type: String,
     },
