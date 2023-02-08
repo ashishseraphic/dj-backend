@@ -5,6 +5,7 @@ const User = require("../model/userModel");
 module.exports = {
   verifyToken: async (req, res, next) => {
     let jwt_token = req.headers['authorization'];
+    console.log(jwt_token);
     let token = jwt_token.split(" ")[1];
     if (!token) {
       return res.json({

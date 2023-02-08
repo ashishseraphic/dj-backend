@@ -9,7 +9,6 @@ module.exports = {
   userLogin: async (req, res) => {
     try {
       const { userName, idToken, role = "user" } = req.body;
-      console.log(req.body.userName);
       const getData = await firebase.postReq(idToken);
       const phoneNumber = getData.users[0].phoneNumber;
       const firebaseUId = getData.users[0].localId;
@@ -23,14 +22,15 @@ module.exports = {
             firebaseUId: firebaseUId,
             role,
           });
-          const jwtToken = jwt.sign(
+          const savedData = await newUser.save();
+          const jwtToken =jwt.sign(
             {
-              id: newUser._id,
+              id:newUser._id,
             },
             process.env.JWT_CONFIG
           );
 
-          const savedData = await newUser.save();
+          
           res.status(200).json({
             status: "success",
             message: "User has been registered successfully",
@@ -39,22 +39,16 @@ module.exports = {
         }
 
         if (logInAuth) {
-          const newUser = {
-            userName: userName,
-            phoneNumber: phoneNumber,
-            firebaseUId: firebaseUId,
-            role,
-          };
           const jwtToken = jwt.sign(
             {
-              id: newUser._id,
+              id: logInAuth._id,
             },
             process.env.JWT_CONFIG
           );
           res.status(200).json({
             status: "success",
             message: "Logged in successfully",
-            data: { user: newUser, token: jwtToken },
+            data: { user: logInAuth, token: jwtToken },
           });
         }
       } catch (err) {

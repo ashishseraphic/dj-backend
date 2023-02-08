@@ -5,6 +5,7 @@ module.exports = {
   addOrderReq: async (req, res) => {
     console.log("request data check for body - ",req.body);
     const {id} = req.user;
+    console.log({id})
     const { message, songName, djId } = req.body;
 
     try {
