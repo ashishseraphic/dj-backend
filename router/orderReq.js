@@ -3,7 +3,11 @@ const {addOrderReq,getOrderReq,getAllOrderReq,deleteOrderReq,deleteAllOrderReq,o
 const {verifyToken}= require("../helpers/jwtFunction");
 const {upload} = require("../multerFile/multer")
 
-router.post("/addorderrequest",upload.single('image'),verifyToken,addOrderReq);
+const cpUpload = upload.fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 },{ name: 'voiceMessage', maxCount: 1 }])
+// const img = upload.single('image')
+// const ved = upload.single('vedio')
+
+router.post("/addorderrequest",cpUpload,verifyToken,addOrderReq);
 router.get("/getorderrequest",getOrderReq);
 router.get("/getallorderrequest",getAllOrderReq);
 router.delete("/deleteorderrequest/:id",deleteOrderReq);

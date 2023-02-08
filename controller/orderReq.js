@@ -3,32 +3,61 @@ const order = require("../model/orderModel");
 
 module.exports = {
   addOrderReq: async (req, res) => {
-    const getid = req.user.id;
+    console.log("request data check for body - ",req.body);
+    const {id} = req.user;
     const { message, songName, djId } = req.body;
 
     try {
-      const songReq = await user.findOne({ _id: getid });
+      const songReq = await user.findOne({ _id: id });
       if (!songReq._id) {
         return res.json({
           status: "error",
           message: "User not found",
           data: null,
         });
-      } else {
-        const newData = await order.create({
-          userId: getid,
+      }
+        let dataToSend = {
+          userId: id,
           djId: djId,
           message: message,
           songName: songName,
-          image: "static/" + req.file?.filename,
-        });
-        const savedData = await newData.save();
-        res.status(200).json({
-          status: "success",
-          message: "Song request saved successfully",
-          data: { user: savedData },
-        });
-      }
+        };
+        if (req.files?.image) {
+          dataToSend = {
+            ...dataToSend,
+            image: "static/" + req.files.image[0].filename,
+          };
+        }
+        if (req.files?.video) {
+          dataToSend = {
+            ...dataToSend,
+            video: "static/" + req.files.video[0].filename,
+          };
+        }
+        if (req.files?.voiceMessage) {
+          dataToSend = {
+            ...dataToSend,
+            voiceMessage: "static/" + req.files.voiceMessage[0].filename,
+          };
+        }
+        const newData = await order.create(dataToSend);
+        if (
+          !newData.message &&
+          !newData.video &&
+          !newData.image &&
+          !newData.songName &&
+          !newData.voiceMessage
+        ) {
+          res.send({status:"Fails",message:"Atleast One Field Required"});
+        } else {
+          const savedData = await newData.save();
+          res.status(200).json({
+            status: "success",
+            message: "Song request saved successfully",
+            data: { user: savedData },
+          });
+        }
+      
     } catch (err) {
       res.status(500).json({
         status: "error",
@@ -166,19 +195,19 @@ module.exports = {
     const { status } = req.body;
 
     try {
-      if(!status){
+      if (!status) {
         res.send({
           status: "fail",
-          message:"status field is Empty",
-          data:null
-        })
-      }
-      const ordersRes = await order.find({ status, djId }); 
-        res.send({
-          status: "success",
-          message: "All Approved request",
-          data: ordersRes,
+          message: "status field is Empty",
+          data: null,
         });
+      }
+      const ordersRes = await order.find({ status, djId });
+      res.send({
+        status: "success",
+        message: "All Approved request",
+        data: ordersRes,
+      });
     } catch (err) {
       res.json({});
     }

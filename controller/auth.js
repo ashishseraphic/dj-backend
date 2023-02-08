@@ -9,6 +9,7 @@ module.exports = {
   userLogin: async (req, res) => {
     try {
       const { userName, idToken, role = "user" } = req.body;
+      console.log(req.body.userName);
       const getData = await firebase.postReq(idToken);
       const phoneNumber = getData.users[0].phoneNumber;
       const firebaseUId = getData.users[0].localId;
@@ -17,7 +18,7 @@ module.exports = {
         const logInAuth = await user.findOne({ phoneNumber });
         if (!logInAuth) {
           const newUser = await user.create({
-            userName: req.body.userName,
+            userName: userName,
             phoneNumber: phoneNumber,
             firebaseUId: firebaseUId,
             role,
