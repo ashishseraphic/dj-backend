@@ -1,11 +1,9 @@
 const config = {
-    adminCredentials: {
-        email: "admin@livingbeauty.com",
-        password: "test@123",
-        role: "admin",
-        isNewUser: true
-    },
-
+  adminCredentials: {
+    email: "admin@djapp.com",
+    password: "test@123",
+    role: "admin",
+  },
 };
 
-module.exports = config ;
+module.exports = config;

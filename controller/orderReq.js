@@ -3,8 +3,8 @@ const order = require("../model/orderModel");
 
 module.exports = {
   addOrderReq: async (req, res) => {
-    console.log("request data check for body - ",req.body);
-    const {id} = req.user;
+    console.log("request data check for body - ", req.body);
+    const { id } = req.user;
     const { message, songName, djId } = req.body;
 
     try {
@@ -16,48 +16,47 @@ module.exports = {
           data: null,
         });
       }
-        let dataToSend = {
-          userId: id,
-          djId: djId,
-          message: message,
-          songName: songName,
+      let dataToSend = {
+        userId: id,
+        djId: djId,
+        message: message,
+        songName: songName,
+      };
+      if (req.files?.image) {
+        dataToSend = {
+          ...dataToSend,
+          image: "static/" + req.files.image[0].filename,
         };
-        if (req.files?.image) {
-          dataToSend = {
-            ...dataToSend,
-            image: "static/" + req.files.image[0].filename,
-          };
-        }
-        if (req.files?.video) {
-          dataToSend = {
-            ...dataToSend,
-            video: "static/" + req.files.video[0].filename,
-          };
-        }
-        if (req.files?.voiceMessage) {
-          dataToSend = {
-            ...dataToSend,
-            voiceMessage: "static/" + req.files.voiceMessage[0].filename,
-          };
-        }
-        const newData = await order.create(dataToSend);
-        if (
-          !newData.message &&
-          !newData.video &&
-          !newData.image &&
-          !newData.songName &&
-          !newData.voiceMessage
-        ) {
-          res.send({status:"Fails",message:"Atleast One Field Required"});
-        } else {
-          const savedData = await newData.save();
-          res.status(200).json({
-            status: "success",
-            message: "Song request saved successfully",
-            data: { user: savedData },
-          });
-        }
-      
+      }
+      if (req.files?.video) {
+        dataToSend = {
+          ...dataToSend,
+          video: "static/" + req.files.video[0].filename,
+        };
+      }
+      if (req.files?.voiceMessage) {
+        dataToSend = {
+          ...dataToSend,
+          voiceMessage: "static/" + req.files.voiceMessage[0].filename,
+        };
+      }
+      const newData = await order.create(dataToSend);
+      if (
+        !newData.message &&
+        !newData.video &&
+        !newData.image &&
+        !newData.songName &&
+        !newData.voiceMessage
+      ) {
+        res.send({ status: "Fails", message: "Atleast One Field Required" });
+      } else {
+        const savedData = await newData.save();
+        res.status(200).json({
+          status: "success",
+          message: "Song request saved successfully",
+          data: { user: savedData },
+        });
+      }
     } catch (err) {
       res.status(500).json({
         status: "error",
@@ -68,27 +67,39 @@ module.exports = {
   },
 
   getOrderReq: async (req, res) => {
-    const { userId = "", djId = "" } = req.body;
+    // Getting the DJ id from token
+    const { id } = req.user;
+    const { userId } = req.body;
     try {
+      // Get the orders based on user type DJ/USER
       if (userId) {
-        const getdata = await order.find({ userId });
-        res.status(200).json({
+        const getData = await order
+          .find({ userId })
+          .populate("userId")
+          .populate("djId");
+        return res.status(200).json({
           status: "success",
-          message: "Order Data Found",
-          data: { user: getdata },
+          message: "Order Data Found for user",
+          data: { user: getData },
         });
-      }
-      if (djId) {
-        const getdata = await order.find({ djId });
-        res.status(200).json({
+      } else if (id) {
+        const getData = await order
+          .find({ djId: id })
+          .populate("userId")
+          .populate("djId");
+        return res.status(200).json({
           status: "success",
           message: "Order Data Found",
-          data: { user: getdata },
+          data: { user: getData },
         });
       }
     } catch (err) {
-      console.log("error", err.message);
-      res.json("res error", err);
+      console.log("Some issue in getOrderReq (orderReq.js) - ", err.message);
+      res.json({
+        status: "error",
+        message: "Some issue while getting order requests",
+        data: null,
+      });
     }
   },
 
