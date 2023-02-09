@@ -48,7 +48,7 @@ module.exports = {
         !newData.songName &&
         !newData.voiceMessage
       ) {
-        res.send({ status: "Fails", message: "Atleast One Field Required" });
+        res.send({ status: "error", message: "Atleast One Field Required" });
       } else {
         const savedData = await newData.save();
         res.status(200).json({
