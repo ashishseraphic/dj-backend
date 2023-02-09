@@ -5,7 +5,7 @@ module.exports = {
   addOrderReq: async (req, res) => {
     console.log("request data check for body - ", req.body);
     const { id } = req.user;
-    const { message, songName, djId } = req.body;
+    const { message, songName, djId, amount } = req.body;
 
     try {
       const songReq = await user.findOne({ _id: id });
@@ -18,9 +18,10 @@ module.exports = {
       }
       let dataToSend = {
         userId: id,
-        djId: djId,
-        message: message,
-        songName: songName,
+        djId,
+        message,
+        songName,
+        amount,
       };
       if (req.files?.image) {
         dataToSend = {
@@ -46,21 +47,26 @@ module.exports = {
         !newData.video &&
         !newData.image &&
         !newData.songName &&
-        !newData.voiceMessage
+        !newData.voiceMessage &&
+        !newData.amount
       ) {
-        res.send({ status: "error", message: "Atleast One Field Required" });
+        res.send({
+          status: "error",
+          message: "Atleast One Field Required",
+          data: null,
+        });
       } else {
         const savedData = await newData.save();
         res.status(200).json({
           status: "success",
           message: "Song request saved successfully",
-          data: { user: savedData },
+          data: savedData,
         });
       }
     } catch (err) {
       res.status(500).json({
         status: "error",
-        message: "Some issue while user authentication",
+        message: "Some issue while adding order",
         data: err.message,
       });
     }
@@ -208,7 +214,7 @@ module.exports = {
     try {
       if (!status) {
         res.send({
-          status: "fail",
+          status: "error",
           message: "status field is Empty",
           data: null,
         });
@@ -216,11 +222,15 @@ module.exports = {
       const ordersRes = await order.find({ status, djId });
       res.send({
         status: "success",
-        message: "All Approved request",
+        message: `Fetched ${status} requests`,
         data: ordersRes,
       });
     } catch (err) {
-      res.json({});
+      res.json({
+        status: "error",
+        message: `Fetch ${status} request failed`,
+        data: err,
+      });
     }
   },
 };

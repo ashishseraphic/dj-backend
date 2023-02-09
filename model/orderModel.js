@@ -16,20 +16,24 @@ const orderSchema = new mongoose.Schema(
     image: {
       type: String,
     },
-    video:{
-      type:String
+    video: {
+      type: String,
     },
-    voiceMessage:{
-      type:String
+    voiceMessage: {
+      type: String,
     },
     songName: {
       type: String,
     },
-    status:{
+    status: {
       type: String,
       enum: ["approve", "reject", "pending"],
-      default:"pending"
-    }
+      default: "pending",
+    },
+    amount: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
