@@ -25,6 +25,6 @@ router.get("/getallorderrequest", getAllOrderReq);
 router.delete("/deleteorderrequest/:id", deleteOrderReq);
 router.delete("/deleteallorderrequest", deleteAllOrderReq);
 router.patch("/orderaction", verifyToken, orderAction);
-router.get("/getorderbystatus", verifyToken, getOrderByStatus);
+router.post("/getorderbystatus", verifyToken, getOrderByStatus);
 
 module.exports = router;
