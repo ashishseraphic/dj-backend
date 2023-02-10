@@ -29,8 +29,6 @@ module.exports = {
             },
             process.env.JWT_CONFIG
           );
-
-          
           res.status(200).json({
             status: "success",
             message: "User has been registered successfully",

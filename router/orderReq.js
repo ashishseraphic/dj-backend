@@ -19,12 +19,12 @@ const cpUpload = upload.fields([
 // const img = upload.single('image')
 // const ved = upload.single('vedio')
 
-router.post("/addorderrequest", cpUpload, verifyToken, addOrderReq);
-router.post("/getorderrequest", verifyToken, getOrderReq);
-router.get("/getallorderrequest", getAllOrderReq);
-router.delete("/deleteorderrequest/:id", deleteOrderReq);
-router.delete("/deleteallorderrequest", deleteAllOrderReq);
-router.patch("/orderaction", verifyToken, orderAction);
-router.post("/getorderbystatus", verifyToken, getOrderByStatus);
+router.post("/addOrderRequest", cpUpload, verifyToken, addOrderReq);
+router.get("/getOrderRequest",verifyToken, getOrderReq);
+router.get("/getAllOrderRequest", getAllOrderReq);
+router.delete("/deleteOrderRequest/:id", deleteOrderReq);
+router.delete("/deleteAllOrderRequest", deleteAllOrderReq);
+router.patch("/orderAction", verifyToken, orderAction);
+router.post("/getOrderByStatus", verifyToken, getOrderByStatus);
 
 module.exports = router;

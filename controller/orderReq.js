@@ -74,8 +74,8 @@ module.exports = {
 
   getOrderReq: async (req, res) => {
     // Getting the DJ id from token
-    const { id } = req.user;
     const { userId } = req.body;
+    const { id } = req.user;
     try {
       // Get the orders based on user type DJ/USER
       if (userId) {
@@ -220,7 +220,8 @@ module.exports = {
         });
       }
       const ordersRes = await order.find({ status, djId });
-      res.send({
+      console.log(ordersRes);
+      res.json({
         status: "success",
         message: `Fetched ${status} requests`,
         data: ordersRes,
