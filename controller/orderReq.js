@@ -3,9 +3,10 @@ const order = require("../model/orderModel");
 
 module.exports = {
   addOrderReq: async (req, res) => {
-    console.log("request data check for body - ", req.body);
     const { id } = req.user;
     const { message, songName, djId, amount } = req.body;
+    console.log("request data check for body - ", req.body);
+    console.log("request data user for body - ", req.user);
 
     try {
       const songReq = await user.findOne({ _id: id });
@@ -110,13 +111,18 @@ module.exports = {
   },
 
   getAllOrderReq: async (req, res) => {
+    
+    const { page = 1, limit = 3 } = req.query; 
+    
     try {
-      const getdata = await order.find(req.body);
+      const getdata = await order.find().sort({createdAt:-1}).limit(limit*1).skip((page-1)*limit).exec();
       console.log("get data", getdata);
+      const count = await order.countDocuments();
+      console.log("count",count);
       res.status(200).json({
         status: "success",
         message: "All Order Data Found",
-        data: { user: getdata },
+        data: { user: getdata,currentPage:page,totalPages: Math.ceil(count / limit) },
       });
     } catch (err) {
       console.log("error", err.message);
@@ -234,4 +240,6 @@ module.exports = {
       });
     }
   },
+
+
 };
