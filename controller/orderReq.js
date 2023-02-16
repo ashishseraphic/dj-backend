@@ -3,9 +3,10 @@ const order = require("../model/orderModel");
 
 module.exports = {
   addOrderReq: async (req, res) => {
-    console.log("request data check for body - ", req.body);
     const { id } = req.user;
     const { message, songName, djId, amount } = req.body;
+    console.log("request data check for body - ", req.body);
+    console.log("request data check for body - ", req.user);
 
     try {
       const songReq = await user.findOne({ _id: id });
@@ -219,8 +220,11 @@ module.exports = {
           data: null,
         });
       }
-      const ordersRes = await order.find({ status, djId });
-      console.log(ordersRes);
+      const ordersRes = await order
+        .find({ status, djId })
+        .populate("userId")
+        .populate("djId");
+
       res.json({
         status: "success",
         message: `Fetched ${status} requests`,
