@@ -1,6 +1,7 @@
 const user = require("../model/userModel");
 const jwt = require("jsonwebtoken");
 const firebase = require("../helpers/firebasePostReq");
+const emailValidator = require('email-validator')
 
 // helper methods
 const { passwordHasher, passwordCompare } = require("../helpers/jwtFunction");
@@ -63,12 +64,19 @@ module.exports = {
   },
 
   djLogin: async (req, res) => {
+    console.log("check",req.body);
     let { email, password, role = "dj" } = req.body;
 
     try {
       const logInAuth = await user.findOne({ email });
 
       // If user donot have entry in DB than register handler
+      // if (!emailValidator.validate(email)) {
+      //   res.json({
+      //     status: false,
+      //     message: "Please Enter a Valid Email Address",
+      //   });
+      // }
       if (!logInAuth) {
         const hassword = await passwordHasher(password);
         const newData = await user.create({
@@ -171,10 +179,10 @@ module.exports = {
 
   findUserbyId: async (req, res) => {
     const { id } = req.body
-    console.log("req.id",id);
+    console.log("req.id", id);
     try {
       const acceptingStatus = await user.findById({ _id: id })
-      console.log("check id response",acceptingStatus);
+      console.log("check id response", acceptingStatus);
       res.json({
         status: "success",
         message: "Fetch data successfully",
