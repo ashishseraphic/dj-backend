@@ -1,6 +1,7 @@
 const user = require("../model/userModel");
 const jwt = require("jsonwebtoken");
 const firebase = require("../helpers/firebasePostReq");
+const emailValidator = require('email-validator')
 
 // helper methods
 const { passwordHasher, passwordCompare } = require("../helpers/jwtFunction");
@@ -23,9 +24,9 @@ module.exports = {
             role,
           });
           const savedData = await newUser.save();
-          const jwtToken =jwt.sign(
+          const jwtToken = jwt.sign(
             {
-              id:newUser._id,
+              id: newUser._id,
             },
             process.env.JWT_CONFIG
           );
@@ -63,12 +64,19 @@ module.exports = {
   },
 
   djLogin: async (req, res) => {
+    console.log("check",req.body);
     let { email, password, role = "dj" } = req.body;
 
     try {
       const logInAuth = await user.findOne({ email });
 
       // If user donot have entry in DB than register handler
+      // if (!emailValidator.validate(email)) {
+      //   res.json({
+      //     status: false,
+      //     message: "Please Enter a Valid Email Address",
+      //   });
+      // }
       if (!logInAuth) {
         const hassword = await passwordHasher(password);
         const newData = await user.create({
@@ -135,4 +143,58 @@ module.exports = {
       });
     }
   },
+
+  djIdAccepte: async (req, res) => {
+    const { id } = req.user;
+    const { isAccepting } = req.body;
+    console.log(id);
+
+    try {
+      const acceptingStatus = await user.findOne({ _id: id })
+
+      if (acceptingStatus.isAccepting == isAccepting) {
+        res.json({
+          status: "success",
+          message: "dJ Admin Accepted request",
+          data: acceptingStatus,
+        })
+      }
+      if (acceptingStatus.isAccepting != isAccepting) {
+        acceptingStatus.isAccepting = isAccepting;
+        const accepting = await acceptingStatus.save();
+        res.json({
+          status: "success",
+          message: "Fetch Data Successfully",
+          data: accepting,
+        })
+      }
+    } catch (err) {
+      res.status(500).json({
+        status: "error",
+        message: "Some issue while user authentication",
+        data: err.message,
+      });
+    }
+  },
+
+  findUserbyId: async (req, res) => {
+    const { id } = req.body
+    console.log("req.id", id);
+    try {
+      const acceptingStatus = await user.findById({ _id: id })
+      console.log("check id response", acceptingStatus);
+      res.json({
+        status: "success",
+        message: "Fetch data successfully",
+        data: acceptingStatus,
+      })
+    } catch (err) {
+      res.status(500).json({
+        status: "error",
+        message: "Some issue while user authentication",
+        data: err.message,
+      });
+    }
+  }
+
 };

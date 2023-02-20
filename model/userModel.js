@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
     firebaseUId: {
       type: String,
     },
+    isAccepting: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

@@ -111,13 +111,26 @@ module.exports = {
   },
 
   getAllOrderReq: async (req, res) => {
+    const { page = 1, limit = 3 } = req.query;
+
     try {
-      const getdata = await order.find(req.body);
+      const getdata = await order
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .exec();
       console.log("get data", getdata);
+      const count = await order.countDocuments();
+      console.log("count", count);
       res.status(200).json({
         status: "success",
         message: "All Order Data Found",
-        data: { user: getdata },
+        data: {
+          user: getdata,
+          currentPage: page,
+          totalPages: Math.ceil(count / limit),
+        },
       });
     } catch (err) {
       console.log("error", err.message);
