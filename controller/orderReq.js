@@ -224,6 +224,7 @@ module.exports = {
     const djId = req.user.id;
     console.log(djId);
     const { status } = req.body;
+    const { page = 1, limit = 10 } = req.query;
 
     try {
       if (!status) {
@@ -236,12 +237,20 @@ module.exports = {
       const ordersRes = await order
         .find({ status, djId })
         .populate("userId")
-        .populate("djId");
-
+        .populate("djId")
+        .sort({ createdAt: -1 })
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .exec();
+      const count = await order.countDocuments();
       res.json({
         status: "success",
         message: `Fetched ${status} requests`,
-        data: ordersRes,
+        data:
+        {
+          user:ordersRes, currentPage: parseInt(page),
+          totalPages: Math.ceil(count / limit)
+        },
       });
     } catch (err) {
       res.json({
